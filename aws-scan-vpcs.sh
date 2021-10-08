@@ -5,15 +5,15 @@
 #
 #####
 
-if [ "$#" -ne 1 ]
+if [ "$#" -ne 2 ]
   then
-  echo -e "\nUsage: $0 aws-profile \n";
+  echo -e "\nUsage: $0 aws_profile aws_region \n";
   exit 1;
 fi
 
 # Set defaults
-aws_region="us-east-1"
 aws_profile="$1"
+aws_region="$2"
 
 # Set simple logging
 exectime=`date +%Y-%m-%d-%H%M%S`
@@ -36,14 +36,15 @@ function aws_test_id (){
 function aws_scan_vpc_resources () {
   # 1: aws_profile
   # 2: aws_region
-  echo "Scan EC2 instances for the VPC ID"
+  echo -e "${green}Scan EC2 instances for the VPC ID ${nc}"
   vpc_list=`aws ec2 describe-instances --profile $1 --region $2 | jq -r -c ' .Reservations[] | .Instances[].VpcId ' | uniq`
-  echo "$vpc_list"
+  echo -e "${yellow}$vpc_list ${nc}"
   # echo "Scan RDS instances for VPC ID"
 
 }
 
 # Get it done.
+echo " "
 echo -e "${green}Verify we have access. ${nc}"
 aws_test_id $aws_profile
 echo -e "${green}Discover VPCs attached to EC2 instances. ${nc}"
